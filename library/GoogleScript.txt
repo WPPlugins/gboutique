@@ -1,0 +1,54 @@
+function onOpen() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var menuEntries = [{name: "Visit your Shop", functionName: "VisitShop"},
+                     {name: "Billing", functionName: "Billing"}];
+  ss.addMenu("gBoutique", menuEntries);
+}
+
+function VisitShop() {
+  // Get Shop url :
+  var shopurl = searchVariable('Settings','shopurl');
+  // End of get shop url
+  var app = UiApp.createApplication().setTitle('Visit the Shop');
+  var mainPanel = app.createVerticalPanel().setId('mainPanel');
+  var mygrid = app.createGrid(3, 1);
+  var VisitTheShopLink = app.createAnchor('Visit the shop (open in a new tab)',shopurl);
+  mygrid.setWidget(0, 0, VisitTheShopLink);
+  mainPanel.add(mygrid); 
+  app.add(mainPanel);
+  var SalesSheet = SpreadsheetApp.getActiveSpreadsheet();
+  SalesSheet.show(app);
+}
+
+function Billing() {
+  // Get Shop url :
+  var shopurl = searchVariable('Settings','shopurl');
+  // End of get shop url
+  var SalesSheet = SpreadsheetApp.getActiveSpreadsheet();
+  var range = SalesSheet.getActiveCell();
+  var Row = range.getRowIndex()-1;  
+  var app = UiApp.createApplication().setTitle('Bills');
+  var mainPanel = app.createVerticalPanel().setId('mainPanel');
+  var mygrid = app.createGrid(3, 1);
+  var ViewBillInBrowserLink = app.createAnchor('View Bill in Browser',shopurl+'/billing?action=browser&id='+Row);
+  var DownloadBillLink = app.createAnchor('Download Bill', shopurl+'/billing?action=download&id='+Row);
+  var SendBillPerEmailLink = app.createAnchor('Send Bill per Email',shopurl+'/billing?action=email&id='+Row);
+  mygrid.setWidget(0, 0, ViewBillInBrowserLink);
+  mygrid.setWidget(1, 0, DownloadBillLink);
+  mygrid.setWidget(2, 0, SendBillPerEmailLink);
+  mainPanel.add(mygrid); 
+  app.add(mainPanel);
+  SalesSheet.show(app);
+}
+
+function searchVariable(sheet,searchKey) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheet);
+  var data = sheet.getRange(1,1,sheet.getLastRow(),2).getValues();
+  for( var i = 0; i < data.length; i++ ){
+    if( searchKey == data[i][0] ){
+      var row=i;
+      var variable=data[i][1];
+    }
+  }
+  return variable;
+}
